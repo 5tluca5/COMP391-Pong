@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
-using System.Runtime.CompilerServices;
 
 public enum Players
 {
@@ -15,29 +14,35 @@ public class GameController : MonoBehaviour
     public Canvas canvas;
     public Player player1;
     public Player player2;
-
-    private Players lastLoser;
     public BallGenerator ballGenerator;
+
+    [Header("Score")]
+    public TextMesh p1Score;
+    public TextMesh p2Score;
 
     [Header("Game parameter")]
     public float maxMoveDistance;
     public float moveSpeed;
 
+    private Players lastLoser;
+
     static GameController instance;
+
     private void Awake()
     {
+        instance = this;
         DontDestroyOnLoad(gameObject);
     }
 
-    public static GameController Instance()
+    public static GameController Instance
     {
-        if(instance == null)
+        get
         {
-            instance = new GameController();
+            return instance;
         }
-
-        return instance;
     }
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -84,6 +89,14 @@ public class GameController : MonoBehaviour
         maxMoveDistance = canvas.GetComponent<RectTransform>().sizeDelta.y / 2 - 50;
         moveSpeed = Screen.safeArea.height;
         lastLoser = Random.Range(0, 2) == 0 ? Players.Player1 : Players.Player2;
+
+        player2.score.Subscribe(score => { 
+            p2Score.text = score.ToString();
+        }).AddTo(p2Score.gameObject);
+        
+        player1.score.Subscribe(score => {
+            p1Score.text = score.ToString();
+        }).AddTo(p1Score.gameObject);
     }
 
     public void MovePlayerUpward(Player player)
@@ -106,6 +119,19 @@ public class GameController : MonoBehaviour
         else
         {
             player.rtfBody.anchoredPosition = new Vector2(player.rtfBody.anchoredPosition.x, -maxMoveDistance);
+        }
+    }
+
+    public void GameOver(Players winner)
+    {
+        switch (winner)
+        {
+            case Players.Player1:
+                player1.score.Value += 1;
+                break;
+            case Players.Player2:
+                player2.score.Value += 1;
+                break;
         }
     }
 }
