@@ -82,6 +82,7 @@ public class GameController : MonoBehaviour
     private void Init()
     {
         maxMoveDistance = canvas.GetComponent<RectTransform>().sizeDelta.y / 2 - 50;
+        moveSpeed = Screen.safeArea.height;
         lastLoser = Random.Range(0, 2) == 0 ? Players.Player1 : Players.Player2;
     }
 
@@ -89,7 +90,7 @@ public class GameController : MonoBehaviour
     {
         if(player.rtfBody.anchoredPosition.y < maxMoveDistance)
         {
-            player.rtfBody.anchoredPosition += new Vector2(0, moveSpeed);
+            player.rtfBody.anchoredPosition += new Vector2(0, moveSpeed * Time.deltaTime);
         }
         else
         {
@@ -100,7 +101,7 @@ public class GameController : MonoBehaviour
     {
         if (player.rtfBody.anchoredPosition.y > -maxMoveDistance)
         {
-            player.rtfBody.anchoredPosition -= new Vector2(0, moveSpeed);
+            player.rtfBody.anchoredPosition -= new Vector2(0, moveSpeed * Time.deltaTime);
         }
         else
         {

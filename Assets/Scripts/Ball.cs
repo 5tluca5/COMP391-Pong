@@ -45,7 +45,7 @@ public class Ball : MonoBehaviour
 
             if(collideCount % 5 == 0)
             {
-                bonus = 1 + (collideCount / 100f);
+                bonus = 1 + (collideCount / 50f);
             }
         }
 
