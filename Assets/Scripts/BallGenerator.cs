@@ -21,18 +21,18 @@ public class BallGenerator : MonoBehaviour
         
     }
 
-    Vector2 GenerateForce(Players playerSide)
+    Vector2 GenerateForce(Players playerSide, float speed = 1)
     {
         Vector2 force = Vector2.zero;
         var randomUpward = Random.Range(0, 2) == 0;
 
         if(playerSide == Players.Player1)
         {
-            force = new Vector2(-250, 250 * (randomUpward ? 1 : -1));
+            force = new Vector2(-500, 250 * (randomUpward ? 1 : -1));
         }
         else
         {
-            force = new Vector2(250, 250 * (randomUpward ? 1 : -1));
+            force = new Vector2(500, 250 * (randomUpward ? 1 : -1));
 
         }
 
