@@ -20,9 +20,14 @@ public class GameController : MonoBehaviour
     public TextMesh p1Score;
     public TextMesh p2Score;
 
+    [Header("Result page")]
+    public GameObject resultPage;
+    public TMPro.TMP_Text winnerText;
+
     [Header("Game parameter")]
     public float maxMoveDistance;
     public float moveSpeed;
+    bool isGameOver = false;
 
     private Players lastLoser;
 
@@ -60,6 +65,8 @@ public class GameController : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (isGameOver) return;
+
         if(Input.GetKey(KeyCode.W))
         {
             MovePlayerUpward(player1);
@@ -86,6 +93,7 @@ public class GameController : MonoBehaviour
 
     private void Init()
     {
+        isGameOver = false;
         maxMoveDistance = canvas.GetComponent<RectTransform>().sizeDelta.y / 2 - 50;
         moveSpeed = Screen.safeArea.height;
         lastLoser = Random.Range(0, 2) == 0 ? Players.Player1 : Players.Player2;
@@ -133,5 +141,22 @@ public class GameController : MonoBehaviour
                 player2.score.Value += 1;
                 break;
         }
+
+        if(player1.score.Value >= 3)
+        {
+            AnnounceTheWinner(Players.Player1);
+        }
+        else if (player2.score.Value >= 3)
+        {
+            AnnounceTheWinner(Players.Player2);
+        }
+    }
+
+    public void AnnounceTheWinner(Players winner)
+    {
+        isGameOver = true;
+
+        resultPage.SetActive(true);
+        winnerText.text = string.Format("<color=#FFEE00>{0}</color>",winner.ToString()) + " Win!";
     }
 }
