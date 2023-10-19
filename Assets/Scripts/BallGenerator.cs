@@ -1,23 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using DG.Tweening;
 public class BallGenerator : MonoBehaviour
 {
     public GameObject ballPrefab;
     public GameController gameController;
 
+    public float ballSpeedMultipler = 1.0f;
+
     private void Start()
     {
         
     }
-    public void GenerateBall(Players playerSide)
+    public bool GenerateBall(Players playerSide)
     {
-        if (transform.childCount > 0) return;
+        if (transform.childCount > 0) return false;
 
         var ball = GameObject.Instantiate(ballPrefab, transform).GetComponent<Ball>();
         ball.rtfBody.anchoredPosition = GenerateSpawnSpot(playerSide);
         ball.AddForce(GenerateForce(playerSide));
+
+        return true;
         
     }
 
@@ -28,11 +32,11 @@ public class BallGenerator : MonoBehaviour
 
         if(playerSide == Players.Player1)
         {
-            force = new Vector2(-500, 250 * (randomUpward ? 1 : -1));
+            force = new Vector2(-500, 250 * (randomUpward ? 1 : -1)) * ballSpeedMultipler;
         }
         else
         {
-            force = new Vector2(500, 250 * (randomUpward ? 1 : -1));
+            force = new Vector2(500, 250 * (randomUpward ? 1 : -1)) * ballSpeedMultipler;
 
         }
 

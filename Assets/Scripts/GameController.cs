@@ -26,8 +26,14 @@ public class GameController : MonoBehaviour
 
     [Header("Game parameter")]
     public float maxMoveDistance;
-    public float moveSpeed;
+    public float moveSpeedMultipler = 1.5f;
+    float moveSpeed;
     bool isGameOver = false;
+    bool isGameStart = false;
+
+    [Header("Items")]
+    public ItemGenerator itemGenerator;
+    public ItemEffectController itemEffectController;
 
     private Players lastLoser;
 
@@ -63,6 +69,14 @@ public class GameController : MonoBehaviour
         Init();
     }
 
+    private void Update()
+    {
+        if(isGameStart)
+        {
+            itemGenerator.UpdateTimer();
+        }
+    }
+
     private void LateUpdate()
     {
         if (isGameOver) return;
@@ -87,15 +101,16 @@ public class GameController : MonoBehaviour
 
         if(Input.GetKey(KeyCode.Space))
         {
-            ballGenerator.GenerateBall(lastLoser);
+            if (ballGenerator.GenerateBall(lastLoser))
+                isGameStart = true;
         }
     }
 
     private void Init()
     {
         isGameOver = false;
-        maxMoveDistance = canvas.GetComponent<RectTransform>().sizeDelta.y / 2 - 50;
-        moveSpeed = Screen.safeArea.height;
+        maxMoveDistance = canvas.GetComponent<RectTransform>().sizeDelta.y / 2 - player1.rtfBody.sizeDelta.y;
+        moveSpeed = Screen.safeArea.height * moveSpeedMultipler;
         lastLoser = Random.Range(0, 2) == 0 ? Players.Player1 : Players.Player2;
 
         player2.score.Subscribe(score => { 
@@ -132,6 +147,9 @@ public class GameController : MonoBehaviour
 
     public void GameOver(Players winner)
     {
+        isGameStart = false;
+        itemGenerator.Reset();
+
         switch (winner)
         {
             case Players.Player1:
@@ -158,5 +176,11 @@ public class GameController : MonoBehaviour
 
         resultPage.SetActive(true);
         winnerText.text = string.Format("<color=#FFEE00>{0}</color>",winner.ToString()) + " Win!";
+    }
+
+    public void TriggerItem(Item item)
+    {
+        var cloneItem = new Item(item.itemType, item.playerSide);
+        itemEffectController.GenerateEffectText(cloneItem);
     }
 }

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniRx", "UniRx.csproj", "{9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniRx.Examples", "UniRx.Examples.csproj", "{78D098DB-EF6D-3523-D288-730F97186069}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-firstpass", "Assembly-CSharp-firstpass.csproj", "{C966203A-F569-5638-82E9-EC80EDD55A88}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{78D098DB-EF6D-3523-D288-730F97186069}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78D098DB-EF6D-3523-D288-730F97186069}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78D098DB-EF6D-3523-D288-730F97186069}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C966203A-F569-5638-82E9-EC80EDD55A88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C966203A-F569-5638-82E9-EC80EDD55A88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C966203A-F569-5638-82E9-EC80EDD55A88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C966203A-F569-5638-82E9-EC80EDD55A88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

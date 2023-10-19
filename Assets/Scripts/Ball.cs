@@ -74,7 +74,7 @@ public class Ball : MonoBehaviour
                 GameController.Instance.GameOver(Players.Player1);
             }
 
-            Destroy(gameObject, 1f);
+            Destroy(gameObject, 0.2f);
         }
 
     }

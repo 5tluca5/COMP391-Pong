@@ -8,6 +8,10 @@ public class Player : MonoBehaviour
     public RectTransform rtfBody;
     public ReactiveProperty<int> score = new ReactiveProperty<int>(0);
 
+    private void Awake()
+    {
+        rtfBody = GetComponent<RectTransform>();
+    }
     // Start is called before the first frame update
     void Start()
     {
