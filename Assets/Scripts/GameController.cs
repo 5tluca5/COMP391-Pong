@@ -117,7 +117,7 @@ public class GameController : MonoBehaviour
     private void Init()
     {
         isGameOver = false;
-        maxMoveDistance = canvas.GetComponent<RectTransform>().sizeDelta.y / 2 - player1.rtfBody.sizeDelta.y;
+        maxMoveDistance = canvas.GetComponent<RectTransform>().sizeDelta.y / 2 - player1.rtfBody.sizeDelta.y * 0.75f;
         moveSpeed = Screen.safeArea.height * moveSpeedMultipler;
         lastWinner = Random.Range(0, 2) == 0 ? Players.Player1 : Players.Player2;
 
