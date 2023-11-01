@@ -173,7 +173,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -625, y: -270}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7792276658327853706
 CanvasRenderer:
@@ -237,6 +237,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4028ed09169ea4d4cabb91db23b3ed03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemType: 0
+  playerSide: 0
   text: {fileID: 7689750459235078514}
 --- !u!58 &5519961334603210888
 CircleCollider2D:

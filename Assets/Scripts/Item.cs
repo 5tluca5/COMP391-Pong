@@ -74,17 +74,24 @@ public class Item : MonoBehaviour
 
         }
     }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.CompareTag("Ball"))
         {
             GameController.Instance.TriggerItem(this);
-            onDestroy.OnNext(true);
+            //onDestroy.OnNext(true);
+            gameObject.SetActive(false);
         }
     }
 
     public Subject<bool> SubscribeOnDestroy()
     {
         return onDestroy;
+    }
+
+    public void DestroyItem()
+    {
+        onDestroy.OnNext(true);
     }
 }

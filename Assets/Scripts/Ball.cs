@@ -11,11 +11,15 @@ public class Ball : MonoBehaviour
 
     public int collideCount = 0;
 
+    Transform parent;
+    Players attachedPlayer;
+
     private void Awake()
     {
         rtfBody = GetComponent<RectTransform>();
         body = GetComponent<Rigidbody2D>();
         body.gravityScale = 0f;
+        parent = transform.parent;
     }
     // Start is called before the first frame update
     void Start()
@@ -27,6 +31,7 @@ public class Ball : MonoBehaviour
 
     public void AddForce(Vector2 force)
     {
+        transform.parent = parent;
         body.AddForce(force);
     }
 
@@ -77,5 +82,24 @@ public class Ball : MonoBehaviour
             Destroy(gameObject, 0.2f);
         }
 
+    }
+
+    public void AttachTo(Player player, Vector3 offset)
+    {
+        transform.parent = player.transform;
+        transform.localPosition = offset;
+        body.velocity = Vector3.zero;
+
+        attachedPlayer = player.GetPlayerSide();
+    }
+
+    public bool IsAttaching()
+    {
+        return transform.parent.gameObject.CompareTag("Player");
+    }
+
+    public Players GetAttachedPlayerSide()
+    {
+        return attachedPlayer;
     }
 }

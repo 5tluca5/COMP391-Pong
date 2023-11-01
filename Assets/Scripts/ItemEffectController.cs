@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class ItemEffectController : MonoBehaviour
 {
@@ -18,13 +19,30 @@ public class ItemEffectController : MonoBehaviour
 
     public void RemoveEffectText(Item item)
     {
-        texts.ForEach(x =>
+        //texts.ForEach(x =>
+        //{
+        //    if ((x.transform.localPosition.x <= 0 && item.playerSide == Players.Player1) || (x.transform.localPosition.y >= 0 && item.playerSide == Players.Player2))
+        //    {
+        //        Destroy(x.gameObject);
+        //        texts.Remove(x);
+        //    }
+        //});
+
+        if(texts.Exists(x => (x.transform.localPosition.x <= 0 && item.playerSide == Players.Player1) || (x.transform.localPosition.y >= 0 && item.playerSide == Players.Player2)))
         {
-            if ((x.transform.localPosition.x <= 0 && item.playerSide == Players.Player1) || (x.transform.localPosition.y >= 0 && item.playerSide == Players.Player2))
-            {
-                Destroy(x.gameObject);
-                texts.Remove(x);
-            }
-        });
+            var text = texts.First(x => (x.transform.localPosition.x <= 0 && item.playerSide == Players.Player1) || (x.transform.localPosition.y >= 0 && item.playerSide == Players.Player2));
+            Destroy(text.gameObject);
+            texts.Remove(text);
+        }
+    }
+
+    public void Reset()
+    {
+       foreach(var text in texts)
+        {
+            Destroy(text.gameObject);
+        }
+
+        texts.Clear();
     }
 }

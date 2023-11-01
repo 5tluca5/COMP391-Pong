@@ -48,7 +48,7 @@ public class ItemGenerator : MonoBehaviour
             var player1Side = Random.Range(0, 2) == 0;
             var itemType = (ItemType)Random.Range(0, (int)ItemType.ItemTypeTotal);
 
-            if(!player1Item && (player2Item || player1Side))
+            if (!player1Item && (player2Item || player1Side))
             {
                 var pos = spawnPostions[Random.Range(0, spawnPostions.Count)] * new Vector2(-1, 1);
 
