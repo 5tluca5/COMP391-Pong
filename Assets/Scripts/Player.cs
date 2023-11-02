@@ -20,6 +20,9 @@ public class Player : MonoBehaviour
 
     Subject<bool> onItemEffectEnded = new Subject<bool>();
 
+    bool enabledAI = false;
+    float AIMoveTimer = 3f;
+    float AIMoveCooldownTime = 0;
     private void Awake()
     {
         rtfBody = GetComponent<RectTransform>();
@@ -28,6 +31,8 @@ public class Player : MonoBehaviour
     void Start()
     {
         rtfBody = GetComponent<RectTransform>();
+        AIMoveTimer = 3f;
+        AIMoveCooldownTime = 0f;
         //score = new ReactiveProperty<int>(0);
     }
 
@@ -41,9 +46,30 @@ public class Player : MonoBehaviour
         return player;
     }
 
+    public void SetAI(bool enable)
+    {
+        enabledAI = enable;
+    }
+
+    public bool IsEnabledAI()
+    {
+        return enabledAI;
+    }
+
+    private void LateUpdate()
+    {
+        if (IsEnabledAI() && GameController.Instance.IsGameStarted())
+        {
+            if (AIMoveCooldownTime > 0)
+                AIMoveCooldownTime -= Time.deltaTime;
+            else
+                AIMovement();
+        }
+    }
     // Update is called once per frame
     void Update()
     {
+        
         if(freezeTimer > 0)
         {
             freezeTimer -= Time.deltaTime;
@@ -75,6 +101,7 @@ public class Player : MonoBehaviour
 
             if (doublePaddingTimer <= 0)
             {
+                DisableExtraPaddings();
                 onItemEffectEnded.OnNext(true);
                 effectGO.gameObject.SetActive(false);
             }
@@ -93,12 +120,38 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void AIMovement()
+    {
+        AIMoveTimer -= Time.deltaTime;
+
+        //if (IsFreezed()) return;
+
+        float diff = GameController.Instance.GetBall().transform.localPosition.y - rtfBody.anchoredPosition.y;
+
+        //Debug.Log("Diff:" + diff);
+
+        if(diff > 0)
+        {
+            GameController.Instance.MovePlayerUpward(this);
+        }
+        else
+        {
+            GameController.Instance.MovePlayerDownward(this);
+        }
+
+        if(AIMoveTimer <= 0)
+        {
+            AIMoveTimer = Random.Range(5, 30) * 0.1f;
+            AIMoveCooldownTime = Random.Range(2, 10) * 0.1f;
+        }
+    }
+
     public void Reset()
     {
         freezeTimer = 0;
         turboTimer = 0;
         doublePaddingTimer = 0;
-
+        AIMoveTimer = 3f;
 
         effectGO.gameObject.SetActive(false);
         effectGO.color = Color.white;

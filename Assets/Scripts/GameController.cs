@@ -18,6 +18,9 @@ public class GameController : MonoBehaviour
     public TextMesh p1Score;
     public TextMesh p2Score;
 
+    [Header("Start page")]
+    public GameObject startPage;
+
     [Header("Result page")]
     public GameObject resultPage;
     public TMPro.TMP_Text winnerText;
@@ -25,7 +28,7 @@ public class GameController : MonoBehaviour
     [Header("Game parameter")]
     public float maxMoveDistance;
     public float moveSpeedMultipler = 1.5f;
-    float moveSpeed;
+    public float moveSpeed;
     bool isGameOver = false;
     bool isGameStart = false;
 
@@ -78,6 +81,12 @@ public class GameController : MonoBehaviour
 
     private void LateUpdate()
     {
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ResetGame();
+        }
+
         if (isGameOver) return;
 
         if(Input.GetKey(KeyCode.W))
@@ -89,16 +98,19 @@ public class GameController : MonoBehaviour
             MovePlayerDownward(player1);
         }
 
-        if (Input.GetKey(KeyCode.UpArrow))
+        if(!player2.IsEnabledAI())
         {
-            MovePlayerUpward(player2);
-        }
-        if (Input.GetKey(KeyCode.DownArrow))
-        {
-            MovePlayerDownward(player2);
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                MovePlayerUpward(player2);
+            }
+            if (Input.GetKey(KeyCode.DownArrow))
+            {
+                MovePlayerDownward(player2);
+            }
         }
 
-        if(Input.GetKey(KeyCode.Space))
+        if(Input.GetKey(KeyCode.Space) && !startPage.activeSelf)
         {
             if(ballGenerator.IsBallAttached())
             {
@@ -112,6 +124,11 @@ public class GameController : MonoBehaviour
                     isGameStart = true;
             }
         }
+
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            ResetGame();
+        }
     }
 
     private void Init()
@@ -121,6 +138,8 @@ public class GameController : MonoBehaviour
         moveSpeed = Screen.safeArea.height * moveSpeedMultipler;
         lastWinner = Random.Range(0, 2) == 0 ? Players.Player1 : Players.Player2;
 
+        player1.score.Value = 0;
+        player1.score.Value = 0;
         player1.SetPlayer(Players.Player1);
         player2.SetPlayer(Players.Player2);
 
@@ -131,6 +150,23 @@ public class GameController : MonoBehaviour
         player1.score.Subscribe(score => {
             p1Score.text = score.ToString();
         }).AddTo(p1Score.gameObject);
+
+        //OnClickPVC();
+    }
+
+    private void ResetGame()
+    {
+        if (!resultPage.activeSelf || !isGameOver) return;
+
+        resultPage.SetActive(false);
+        isGameOver = false;
+
+        player1.score.Value = 0;
+        player2.score.Value = 0;
+
+        player1.rtfBody.anchoredPosition = new Vector3(player1.rtfBody.anchoredPosition.x, 0);
+        player2.rtfBody.anchoredPosition = new Vector3(player2.rtfBody.anchoredPosition.x, 0);
+
     }
 
     public void MovePlayerUpward(Player player)
@@ -265,5 +301,27 @@ public class GameController : MonoBehaviour
             itemEffectController.RemoveEffectText(cloneItem);
             item.DestroyItem();
         }).AddTo(this);
+    }
+
+    public Ball GetBall()
+    {
+        return ballGenerator.GetCurrentBall();
+    }
+
+    public void OnClickPVC()
+    {
+        player2.SetAI(true);
+        startPage.SetActive(false);
+    }
+
+    public void OnClickPVP()
+    {
+        player2.SetAI(false);
+        startPage.SetActive(false);
+    }
+
+    public bool IsGameStarted()
+    {
+        return isGameStart;
     }
 }
