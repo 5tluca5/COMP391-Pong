@@ -122,8 +122,8 @@
     <Compile Include="Assets/Plugins/UniRx/Scripts/UnityEngineBridge/Triggers/ObservableTriggerTrigger.cs" />
     <Compile Include="Assets/Plugins/UniRx/Scripts/UnityEngineBridge/Diagnostics/LogEntry.cs" />
     <Compile Include="Assets/Plugins/UniRx/Scripts/Operators/OfType.cs" />
-    <Compile Include="Assets/Plugins/UniRx/Scripts/Operators/DelaySubscription.cs" />
     <Compile Include="Assets/Plugins/UniRx/Scripts/Operators/Wait.cs" />
+    <Compile Include="Assets/Plugins/UniRx/Scripts/Operators/DelaySubscription.cs" />
     <Compile Include="Assets/Plugins/UniRx/Scripts/UnityEngineBridge/Triggers/ObservableParticleTrigger.cs" />
     <Compile Include="Assets/Plugins/UniRx/Scripts/Operators/DistinctUntilChanged.cs" />
     <Compile Include="Assets/Plugins/UniRx/Scripts/UnityEngineBridge/InspectorDisplayDrawer.cs" />

@@ -68,18 +68,9 @@ public class Ball : MonoBehaviour
 
         if (wall != null)
         {
-            if(wall.playerSide == Players.Player1)
-            {
-                Debug.Log("Player 1 lose! ");
-                GameController.Instance.GameOver(Players.Player2);
-            }
-            else
-            {
-                Debug.Log("Player 2 lose! ");
-                GameController.Instance.GameOver(Players.Player1);
-            }
+            GameController.Instance.GameOver(wall.playerSide);
 
-            Destroy(gameObject, 0.2f);
+            Destroy(gameObject, 0.05f);
         }
 
     }

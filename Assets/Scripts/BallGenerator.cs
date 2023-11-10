@@ -37,17 +37,34 @@ public class BallGenerator : MonoBehaviour
     Vector2 GenerateForce(Players playerSide, float speed = 1)
     {
         Vector2 force = Vector2.zero;
+        float upwardRange = Random.Range(100, 250);
         var randomUpward = Random.Range(0, 2) == 0;
 
-        if(playerSide == Players.Player1)
+        switch(playerSide)
         {
-            force = new Vector2(-500, 250 * (randomUpward ? 1 : -1)) * ballSpeedMultipler;
+            case Players.Player1:
+                force = new Vector2(-500, upwardRange * (randomUpward ? 1 : -1)) * ballSpeedMultipler;
+                break;
+            case Players.Player2:
+                force = new Vector2(upwardRange * (randomUpward ? 1 : -1), 500) * ballSpeedMultipler;
+                break;
+            case Players.Player3:
+                force = new Vector2(500, upwardRange * (randomUpward ? 1 : -1)) * ballSpeedMultipler;
+                break;
+            case Players.Player4:
+                force = new Vector2(upwardRange * (randomUpward ? 1 : -1), -500) * ballSpeedMultipler;
+                break;
         }
-        else
-        {
-            force = new Vector2(500, 250 * (randomUpward ? 1 : -1)) * ballSpeedMultipler;
 
-        }
+        //if(playerSide == Players.Player1)
+        //{
+        //    force = new Vector2(-500, 250 * (randomUpward ? 1 : -1)) * ballSpeedMultipler;
+        //}
+        //else
+        //{
+        //    force = new Vector2(500, 250 * (randomUpward ? 1 : -1)) * ballSpeedMultipler;
+
+        //}
 
         return force;
     }
@@ -56,7 +73,7 @@ public class BallGenerator : MonoBehaviour
     {
         Vector2 spot = Vector2.zero;
 
-        spot = new Vector2(10 * (playerSide == Players.Player1 ? -1 : 1), Random.Range(-gameController.maxMoveDistance, gameController.maxMoveDistance));
+        //spot = new Vector2(10 * (playerSide == Players.Player1 ? -1 : 1), Random.Range(-gameController.maxMoveDistance, gameController.maxMoveDistance));
 
         return spot;
     }
@@ -71,15 +88,22 @@ public class BallGenerator : MonoBehaviour
         if(IsBallAttached())
         {
             var randomUpward = Random.Range(0, 2) == 0;
+            var playerSide = curBall.GetAttachedPlayerSide();
 
-            if (curBall.GetAttachedPlayerSide() == Players.Player1)
+            switch(playerSide)
             {
-                 curBall.AddForce(new Vector2(1000, 100 * (randomUpward ? 1 : -1)) * ballSpeedMultipler);
-
-            }
-            else
-            {
-                 curBall.AddForce(new Vector2(-1000, 100 * (randomUpward ? 1 : -1)) * ballSpeedMultipler);
+                case Players.Player1:
+                    curBall.AddForce(new Vector2(1000, 100 * (randomUpward ? 1 : -1)) * ballSpeedMultipler);
+                    break;
+                case Players.Player2:
+                    curBall.AddForce(new Vector2(100 * (randomUpward ? 1 : -1), -1000) * ballSpeedMultipler);
+                    break;
+                case Players.Player3:
+                    curBall.AddForce(new Vector2(-1000, 100 * (randomUpward ? 1 : -1)) * ballSpeedMultipler);
+                    break;
+                case Players.Player4:
+                    curBall.AddForce(new Vector2(100 * (randomUpward ? 1 : -1), 1000) * ballSpeedMultipler);
+                    break;
             }
         }
     }

@@ -6,6 +6,7 @@ using System.Linq;
 public class ItemEffectController : MonoBehaviour
 {
     public GameObject itemEffectTextPrefab;
+    public List<Vector3> spawnPostions = new List<Vector3>();
     List<ItemEffectText> texts = new List<ItemEffectText>();
 
     public void GenerateEffectText(Item item)
@@ -13,24 +14,16 @@ public class ItemEffectController : MonoBehaviour
         RemoveEffectText(item);
         var iet = Instantiate(itemEffectTextPrefab, transform).GetComponent<ItemEffectText>();
         iet.SetText(item.itemType);
-        iet.GetComponent<RectTransform>().anchoredPosition = new Vector3(490 * (item.playerSide == Players.Player1 ? -1 : 1), -167, 0);
+        iet.player = item.playerSide;
+        iet.GetComponent<RectTransform>().anchoredPosition = spawnPostions[((int)item.playerSide) - 1];
         texts.Add(iet);
     }
 
     public void RemoveEffectText(Item item)
     {
-        //texts.ForEach(x =>
-        //{
-        //    if ((x.transform.localPosition.x <= 0 && item.playerSide == Players.Player1) || (x.transform.localPosition.y >= 0 && item.playerSide == Players.Player2))
-        //    {
-        //        Destroy(x.gameObject);
-        //        texts.Remove(x);
-        //    }
-        //});
-
-        if(texts.Exists(x => (x.transform.localPosition.x <= 0 && item.playerSide == Players.Player1) || (x.transform.localPosition.y >= 0 && item.playerSide == Players.Player2)))
+        if (texts.Exists(x => x.player == item.playerSide))
         {
-            var text = texts.First(x => (x.transform.localPosition.x <= 0 && item.playerSide == Players.Player1) || (x.transform.localPosition.y >= 0 && item.playerSide == Players.Player2));
+            var text = texts.First(x => x.player == item.playerSide);
             Destroy(text.gameObject);
             texts.Remove(text);
         }

@@ -7,6 +7,7 @@ public class ItemEffectText : MonoBehaviour
 {
     CanvasGroup canvas;
     TMPro.TextMeshProUGUI text;
+    public Players player;
 
     private void Awake()
     {

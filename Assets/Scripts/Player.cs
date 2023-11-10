@@ -23,6 +23,9 @@ public class Player : MonoBehaviour
     bool enabledAI = false;
     float AIMoveTimer = 3f;
     float AIMoveCooldownTime = 0;
+    float AIDirection = -1;
+    float ALMoveCounter = 0;
+
     private void Awake()
     {
         rtfBody = GetComponent<RectTransform>();
@@ -33,7 +36,8 @@ public class Player : MonoBehaviour
         rtfBody = GetComponent<RectTransform>();
         AIMoveTimer = 3f;
         AIMoveCooldownTime = 0f;
-        //score = new ReactiveProperty<int>(0);
+
+        AIMoveTimer = player == Players.Player4 ? 0.5f : 3f;
     }
 
     public void SetPlayer(Players player)
@@ -56,14 +60,31 @@ public class Player : MonoBehaviour
         return enabledAI;
     }
 
-    private void LateUpdate()
+    private void FixedUpdate()
     {
         if (IsEnabledAI() && GameController.Instance.IsGameStarted())
         {
             if (AIMoveCooldownTime > 0)
                 AIMoveCooldownTime -= Time.deltaTime;
             else
-                AIMovement();
+
+            {
+                switch(player)
+                {
+                    case Players.Player1:
+                    case Players.Player3:
+                        AIMovementP3();
+                        break;
+
+                    case Players.Player2:
+                        AIMovementP2();
+                        break;
+
+                    case Players.Player4:
+                        AIMovementP4();
+                        break;
+                }
+            }
         }
     }
     // Update is called once per frame
@@ -120,23 +141,63 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void AIMovement()
+    public void AIMovementP2()
     {
         AIMoveTimer -= Time.deltaTime;
 
-        //if (IsFreezed()) return;
+        float diff = GameController.Instance.GetBall().transform.localPosition.x - rtfBody.anchoredPosition.x;
 
-        float diff = GameController.Instance.GetBall().transform.localPosition.y - rtfBody.anchoredPosition.y;
-
-        //Debug.Log("Diff:" + diff);
-
-        if(diff > 0)
+        if (diff > rtfBody.sizeDelta.y * 0.5)
         {
-            GameController.Instance.MovePlayerUpward(this);
+            GameController.Instance.MovePlayerVertical(this, -1);
+        }
+        else if(diff < rtfBody.sizeDelta.y * 0.5)
+        {
+            GameController.Instance.MovePlayerVertical(this, 1);
+        }
+
+        if (AIMoveTimer <= 0)
+        {
+            AIMoveTimer = Random.Range(5, 30) * 0.1f;
+            AIMoveCooldownTime = Random.Range(2, 20) * 0.1f;
+        }
+    }
+
+
+    public void AIMovementP4()
+    {
+        AIMoveTimer -= Time.deltaTime;
+
+        if (AIDirection > 0)
+        {
+            GameController.Instance.MovePlayerVertical(this, 1);
         }
         else
         {
-            GameController.Instance.MovePlayerDownward(this);
+            GameController.Instance.MovePlayerVertical(this, -1);
+        }
+
+        if (AIMoveTimer <= 0)
+        {
+            AIMoveTimer = 0.5f;
+            AIMoveCooldownTime = 0;
+            AIDirection *= -1;
+        }
+    }
+
+    public void AIMovementP3()
+    {
+        AIMoveTimer -= Time.deltaTime;
+
+        float diff = GameController.Instance.GetBall().transform.localPosition.y - rtfBody.anchoredPosition.y;
+
+        if(diff > rtfBody.sizeDelta.y * 0.5)
+        {
+            GameController.Instance.MovePlayerVertical(this, 1);
+        }
+        else if(diff < rtfBody.sizeDelta.y * 0.5)
+        {
+            GameController.Instance.MovePlayerVertical(this, -1);
         }
 
         if(AIMoveTimer <= 0)
@@ -151,7 +212,8 @@ public class Player : MonoBehaviour
         freezeTimer = 0;
         turboTimer = 0;
         doublePaddingTimer = 0;
-        AIMoveTimer = 3f;
+        AIMoveTimer = player == Players.Player4 ? 0.5f : 3f;
+        AIDirection *= -1;
 
         effectGO.gameObject.SetActive(false);
         effectGO.color = Color.white;

@@ -1,10 +1,15 @@
 using UniRx;
 using UnityEngine;
+using System.Linq;
+using System;
+using System.Collections.Generic;
 
-public enum Players
+public enum Players : int
 {
-    Player1,
+    Player1 = 1,
     Player2,
+    Player3,
+    Player4,
 };
 
 public class GameController : MonoBehaviour
@@ -12,11 +17,16 @@ public class GameController : MonoBehaviour
     public Canvas canvas;
     public Player player1;
     public Player player2;
+    public Player player3;
+    public Player player4;
     public BallGenerator ballGenerator;
+    List<Player> players = new List<Player>();
 
     [Header("Score")]
     public TextMesh p1Score;
     public TextMesh p2Score;
+    public TextMesh p3Score;
+    public TextMesh p4Score;
 
     [Header("Start page")]
     public GameObject startPage;
@@ -62,11 +72,7 @@ public class GameController : MonoBehaviour
         if(canvas == null)
             canvas = GameObject.FindGameObjectWithTag("Canvas").GetComponent<Canvas>();
 
-        if (player1 == null)
-            player1 = GameObject.FindGameObjectsWithTag("Player")[0].GetComponent<Player>();
-
-        if (player2 == null)
-            player2 = GameObject.FindGameObjectsWithTag("Player")[1].GetComponent<Player>();
+        players = new List<Player>() { player1, player2, player3, player4 };
 
         Init();
     }
@@ -85,29 +91,6 @@ public class GameController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             ResetGame();
-        }
-
-        if (isGameOver) return;
-
-        if(Input.GetKey(KeyCode.W))
-        {
-            MovePlayerUpward(player1);
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            MovePlayerDownward(player1);
-        }
-
-        if(!player2.IsEnabledAI())
-        {
-            if (Input.GetKey(KeyCode.UpArrow))
-            {
-                MovePlayerUpward(player2);
-            }
-            if (Input.GetKey(KeyCode.DownArrow))
-            {
-                MovePlayerDownward(player2);
-            }
         }
 
         if(Input.GetKey(KeyCode.Space) && !startPage.activeSelf)
@@ -131,22 +114,83 @@ public class GameController : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+
+        if (isGameOver) return;
+
+        if(!player1.IsEnabledAI())
+        {
+
+            if (Input.GetKey(KeyCode.W))
+            {
+                MovePlayerVertical(player1, 1);
+            }
+            if (Input.GetKey(KeyCode.S))
+            {
+                MovePlayerVertical(player1, -1);
+            }
+
+            //if (Input.GetKey(KeyCode.A))
+            //{
+            //    MovePlayerHorizontal(player2, -1);
+            //}
+            //if (Input.GetKey(KeyCode.D))
+            //{
+            //    MovePlayerHorizontal(player2, 1);
+            //}
+        }
+
+        if (!player2.IsEnabledAI())
+        {
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                MovePlayerVertical(player2, 1);
+            }
+            if (Input.GetKey(KeyCode.DownArrow))
+            {
+                MovePlayerVertical(player2, -1);
+            }
+
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                MovePlayerVertical(player2, -1);
+            }
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                MovePlayerVertical(player2, 1);
+            }
+        }
+
+    }
     private void Init()
     {
         isGameOver = false;
         maxMoveDistance = canvas.GetComponent<RectTransform>().sizeDelta.y / 2 - player1.rtfBody.sizeDelta.y * 0.75f;
-        moveSpeed = Screen.safeArea.height * moveSpeedMultipler;
-        lastWinner = Random.Range(0, 2) == 0 ? Players.Player1 : Players.Player2;
+        moveSpeed = moveSpeed * moveSpeedMultipler;
+        lastWinner = Players.Player1;
 
         player1.score.Value = 0;
-        player1.score.Value = 0;
+        player2.score.Value = 0;
+        player3.score.Value = 0;
+        player4.score.Value = 0;
         player1.SetPlayer(Players.Player1);
         player2.SetPlayer(Players.Player2);
+        player3.SetPlayer(Players.Player3);
+        player4.SetPlayer(Players.Player4);
 
-        player2.score.Subscribe(score => { 
+        player4.score.Subscribe(score => {
+            p4Score.text = score.ToString();
+        }).AddTo(p4Score.gameObject);
+
+        player3.score.Subscribe(score => {
+            p3Score.text = score.ToString();
+        }).AddTo(p3Score.gameObject);
+
+        player2.score.Subscribe(score => {
             p2Score.text = score.ToString();
         }).AddTo(p2Score.gameObject);
-        
+
         player1.score.Subscribe(score => {
             p1Score.text = score.ToString();
         }).AddTo(p1Score.gameObject);
@@ -161,39 +205,46 @@ public class GameController : MonoBehaviour
         resultPage.SetActive(false);
         isGameOver = false;
 
-        player1.score.Value = 0;
-        player2.score.Value = 0;
+        foreach(var player in players)
+        {
+            player.score.Value = 0;
+        }
 
         player1.rtfBody.anchoredPosition = new Vector3(player1.rtfBody.anchoredPosition.x, 0);
-        player2.rtfBody.anchoredPosition = new Vector3(player2.rtfBody.anchoredPosition.x, 0);
+        player2.rtfBody.anchoredPosition = new Vector3(0, player2.rtfBody.anchoredPosition.y);
+        player3.rtfBody.anchoredPosition = new Vector3(player3.rtfBody.anchoredPosition.x, 0);
+        player4.rtfBody.anchoredPosition = new Vector3(0, player4.rtfBody.anchoredPosition.y);
 
     }
 
-    public void MovePlayerUpward(Player player)
+    public void MovePlayerVertical(Player player, int direction)
     {
         if (player.IsFreezed()) return;
 
-        if(player.rtfBody.anchoredPosition.y < maxMoveDistance)
-        {
-            player.rtfBody.anchoredPosition += new Vector2(0, moveSpeed * Time.deltaTime * player.GetSpeedBonus());
-        }
-        else
-        {
-            player.rtfBody.anchoredPosition = new Vector2(player.rtfBody.anchoredPosition.x, maxMoveDistance);
-        }
+        player.rtfBody.Translate(new Vector3(0, moveSpeed * Time.deltaTime * player.GetSpeedBonus() * direction));
+        //if(player.rtfBody.anchoredPosition.y < maxMoveDistance)
+        //{
+        //    player.rtfBody.anchoredPosition += new Vector2(0, moveSpeed * Time.deltaTime * player.GetSpeedBonus());
+        //}
+        //else
+        //{
+        //    player.rtfBody.anchoredPosition = new Vector2(player.rtfBody.anchoredPosition.x, maxMoveDistance);
+        //}
     }
-    public void MovePlayerDownward(Player player)
+    public void MovePlayerHorizontal(Player player, int direction)
     {
         if (player.IsFreezed()) return;
 
-        if (player.rtfBody.anchoredPosition.y > -maxMoveDistance)
-        {
-            player.rtfBody.anchoredPosition -= new Vector2(0, moveSpeed * Time.deltaTime * player.GetSpeedBonus());
-        }
-        else
-        {
-            player.rtfBody.anchoredPosition = new Vector2(player.rtfBody.anchoredPosition.x, -maxMoveDistance);
-        }
+        player.rtfBody.Translate(new Vector3(moveSpeed * Time.deltaTime * player.GetSpeedBonus() * direction, 0));
+
+        //if (player.rtfBody.anchoredPosition.y > -maxMoveDistance)
+        //{
+        //    player.rtfBody.anchoredPosition -= new Vector2(0, moveSpeed * Time.deltaTime * player.GetSpeedBonus());
+        //}
+        //else
+        //{
+        //    player.rtfBody.anchoredPosition = new Vector2(player.rtfBody.anchoredPosition.x, -maxMoveDistance);
+        //}
     }
 
     public void GameOver(Players winner)
@@ -204,18 +255,26 @@ public class GameController : MonoBehaviour
         itemEffectController.Reset();
         player1.Reset();
         player2.Reset();
+        player3.Reset();
+        player4.Reset();
 
         switch (winner)
         {
             case Players.Player1:
                 player1.score.Value += 1;
-                lastWinner = Players.Player1;
                 break;
             case Players.Player2:
                 player2.score.Value += 1;
-                lastWinner = Players.Player2;
+                break;
+            case Players.Player3:
+                player3.score.Value += 1;
+                break;
+            case Players.Player4:
+                player4.score.Value += 1;
                 break;
         }
+
+        lastWinner = (Players)UnityEngine.Random.Range(1, 5);
 
         if(player1.score.Value >= 3)
         {
@@ -225,6 +284,14 @@ public class GameController : MonoBehaviour
         {
             AnnounceTheWinner(Players.Player2);
         }
+        else if (player3.score.Value >= 3)
+        {
+            AnnounceTheWinner(Players.Player3);
+        }
+        else if (player4.score.Value >= 3)
+        {
+            AnnounceTheWinner(Players.Player4);
+        }
     }
 
     public void AnnounceTheWinner(Players winner)
@@ -232,7 +299,7 @@ public class GameController : MonoBehaviour
         isGameOver = true;
 
         resultPage.SetActive(true);
-        winnerText.text = string.Format("<color=#FFEE00>{0}</color>",winner.ToString()) + " Win!";
+        winnerText.text = string.Format("<color=#FFEE00>{0}</color>",winner.ToString()) + " Lose!";
     }
 
     public void TriggerItem(Item item)
@@ -246,54 +313,73 @@ public class GameController : MonoBehaviour
         switch(item.itemType)
         {
             case ItemType.Freeze:
-                if(item.playerSide == Players.Player1)
+                foreach(var p in players)
                 {
-                    sub = player2.SetFreeze(GameConstants.FREEZE_TIME);
-                }
-                else
-                {
-                    sub = player1.SetFreeze(GameConstants.FREEZE_TIME);
+                    if (p.GetPlayerSide() == cloneItem.playerSide) continue;
+
+                    sub = p.SetFreeze(GameConstants.FREEZE_TIME);
                 }
                 break;
             case ItemType.Turbo:
-                if (item.playerSide == Players.Player1)
+                foreach (var p in players)
                 {
-                    sub = player2.SetTurbo(GameConstants.TURBO_TIME);
-                }
-                else
-                {
-                    sub = player1.SetTurbo(GameConstants.TURBO_TIME);
+                    if (p.GetPlayerSide() == cloneItem.playerSide) continue;
+
+                    sub = p.SetTurbo(GameConstants.TURBO_TIME);
                 }
                 break;
             case ItemType.DoublePadding:
-                if (item.playerSide == Players.Player1)
+                foreach (var p in players)
                 {
-                    sub = player1.EnableExtraPaddings(GameConstants.DOUBLE_PADDLE_TIME);
-                }
-                else
-                {
-                    sub = player2.EnableExtraPaddings(GameConstants.DOUBLE_PADDLE_TIME);
+                    if (p.GetPlayerSide() != cloneItem.playerSide) continue;
+
+                    sub = p.EnableExtraPaddings(GameConstants.DOUBLE_PADDLE_TIME);
                 }
                 break;
             case ItemType.Capture:
-                if (item.playerSide == Players.Player1)
+
+                switch(item.playerSide)
                 {
-                    sub = player1.SetCaptureBall(GameConstants.CAPTURE_TIME);
-                    sub.Subscribe(_ =>
-                    {
-                        ballGenerator.ReleaseBall();
-                    }).AddTo(this);
-                    ballGenerator.GetCurrentBall().AttachTo(player1, new Vector3(20, 0, -1));
+                    case Players.Player1:
+                        sub = player1.SetCaptureBall(GameConstants.CAPTURE_TIME);
+                        ballGenerator.GetCurrentBall().AttachTo(player1, new Vector3(20, 0, -1));
+                        break;
+                    case Players.Player2:
+                        sub = player2.SetCaptureBall(GameConstants.CAPTURE_TIME);
+                        ballGenerator.GetCurrentBall().AttachTo(player2, new Vector3(0, -20, -1));
+                        break;
+                    case Players.Player3:
+                        sub = player3.SetCaptureBall(GameConstants.CAPTURE_TIME);
+                        ballGenerator.GetCurrentBall().AttachTo(player3, new Vector3(-20, 0, -1));
+                        break;
+                    case Players.Player4:
+                        sub = player4.SetCaptureBall(GameConstants.CAPTURE_TIME);
+                        ballGenerator.GetCurrentBall().AttachTo(player4, new Vector3(0, 20, -1));
+                        break;
                 }
-                else
+                sub.Subscribe(_ =>
                 {
-                    sub = player2.SetCaptureBall(GameConstants.CAPTURE_TIME);
-                    sub.Subscribe(_ =>
-                    {
-                        ballGenerator.ReleaseBall();
-                    }).AddTo(this);
-                    ballGenerator.GetCurrentBall().AttachTo(player2, new Vector3(-20, 0, -1));
-                }
+                    ballGenerator.ReleaseBall();
+                }).AddTo(this);
+
+                //if (item.playerSide == Players.Player1)
+                //{
+                //    sub = player1.SetCaptureBall(GameConstants.CAPTURE_TIME);
+                //    sub.Subscribe(_ =>
+                //    {
+                //        ballGenerator.ReleaseBall();
+                //    }).AddTo(this);
+                //    ballGenerator.GetCurrentBall().AttachTo(player1, new Vector3(20, 0, -1));
+                //}
+                //else
+                //{
+                //    sub = player2.SetCaptureBall(GameConstants.CAPTURE_TIME);
+                //    sub.Subscribe(_ =>
+                //    {
+                //        ballGenerator.ReleaseBall();
+                //    }).AddTo(this);
+                //    ballGenerator.GetCurrentBall().AttachTo(player2, new Vector3(-20, 0, -1));
+                //}
                 break;
         }
 
@@ -323,5 +409,15 @@ public class GameController : MonoBehaviour
     public bool IsGameStarted()
     {
         return isGameStart;
+    }
+    
+    public void PlayerJoinGame(Players[] players)
+    {
+        player1.SetAI(!players.Contains(Players.Player1));
+        player2.SetAI(!players.Contains(Players.Player2));
+        player3.SetAI(!players.Contains(Players.Player3));
+        player4.SetAI(!players.Contains(Players.Player4));
+
+        startPage.SetActive(false);
     }
 }
